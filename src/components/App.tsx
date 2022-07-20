@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import Button from "./Button/Button";
+import ButtonProps from './ButtoProps/ButtonProps';
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       </header>
       <h1>My React App</h1>
       <Button/>
+      <ButtonProps></ButtonProps>
     </div>
   );
 }
