@@ -1,9 +1,11 @@
-import React, {FC, useState, useMemo} from 'react'
+import React, {FC, useState, useMemo, ChangeEvent, FormEvent} from 'react'
 import { USERS } from './usersData'
 import { IUser } from './IUser';
+import { initialUser } from './initialUser';
  
 
 const Users:FC = () => {
+    const [user, setUser] = useState(initialUser);
     const [users, setUsers] = useState<IUser[]>(USERS);
     const [search, setSearch] = useState('');
     const[showUserForm, setShowUserForm] = useState(false);
@@ -16,7 +18,17 @@ const Users:FC = () => {
       }
       return users;
     }, [search, users]);
-    console.log(searchedUsers);
+
+    const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+      const field = event.target.id;
+      setUser({...user,[field]:event.target.value});
+    }
+    const addUser = (event: FormEvent) => {
+      event.preventDefault();
+      setUsers([...users, user]);
+      setUser(initialUser);
+    }
+    console.log(user);
     return (
         <>
             <div className="input-group mb-3">
@@ -37,13 +49,22 @@ const Users:FC = () => {
   </button>
 
   {showUserForm && 
-  <form>
-  <div className="mb-3">
-    <label htmlFor="exampleInputEmail1" className="form-label">Email address</label>
-    <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"/>
-    <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
+  <form onSubmit={(event) => addUser(event)}>
+    {Object.keys(user).map(field => {
+        if (field === "id" || field === "address" || field === "company") return;
+            return <div className="mb-3" key={field}>
+                  <label htmlFor={field} className="form-label">{field}</label>
+                  <input type="text" 
+                  className="form-control" 
+                  id={field}
+                  required
+                  value={user[field as keyof Omit<IUser, 'id' | 'address' | 'company' >]}
+                  onChange={(event) => onChange(event)}
+                  />
+            </div>
+        }
 
-  </div>
+  )}
   
   <button type="submit" className="btn btn-primary">Add</button>
   </form>
@@ -57,8 +78,8 @@ const Users:FC = () => {
       <div className="card-body">
         <h5 className="card-title">{`№${user.id} - ${user.name}`}</h5>
         <p className="card-text">Email: {user.email}</p>
-        <p className="card-text">City: {user.address.city}</p>
-        <p className="card-text">Company: {user.company.name}</p>
+        <p className="card-text">Phone: {user.phone}</p>
+        <p className="card-text">Website: {user.website}</p>
       </div>
       <div className="card-footer">
        <button className="btn btn-danger" 
